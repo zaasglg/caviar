@@ -1,23 +1,24 @@
 <main class="pt-[93px] lg:pt-0">
     <section
-        class="bg-[#0B2443] lg:bg-[url({{ asset('assets/images/delivery-bg.svg') }})] py-12 bg-center bg-cover bg-no-repeat">
+        class="bg-[#0B2443] lg:bg-[url({{ asset('assets/images/delivery_bg.png') }})] py-12 bg-center bg-cover bg-no-repeat">
         <div class="w-11/12 lg:w-9/12 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
             <div>
-                <h2 class="text-4xl font-bold text-white">
-                    <span class="text-[#C7A771] block">Доставка</span> по Алматы
+                <h2 class="text-4xl text-white">
+                    <span class="text-[#C7A771] block font-bold">Доставка</span> по Алматы
                 </h2>
 
-                <p class="text-white text-[16px] mt-10 lg:w-2/3">
-                    Доставка производится ежедневно с 9 до 18:00 часов <br><br>
+                <span class="text-[#C7A771] text-[16px] block my-5 ">Доставка производится ежедневно <br /> с 9 до 18:00 часов</span>
+
+                <p class="text-white text-[16px] lg:w-2/3">
                     Доставка осуществляется курьерской службой, деликатесная продукция упаковывается в термопакеты и
                     перевозится в термосумках с хладагентами.
 
                 </p>
             </div>
 
-            <div>
+            {{-- <div>
                 <img src="{{ asset('assets/images/delivery-img.svg') }}" alt="">
-            </div>
+            </div> --}}
         </div>
     </section>
 
