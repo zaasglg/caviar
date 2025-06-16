@@ -4,14 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Promotion extends Model implements HasMedia
+class Promotion extends Model
 {
     use HasFactory;
-    use InteractsWithMedia;
 
     /**
      * The table associated with the model.
@@ -27,7 +24,9 @@ class Promotion extends Model implements HasMedia
      */
     protected $fillable = [
         'title',
+        'description',
         'image_path',
+        'banner_image_path',
         'url',
         'is_active',
         'sort_order',
@@ -44,12 +43,19 @@ class Promotion extends Model implements HasMedia
     ];
 
     /**
-     * Регистрация медиа-коллекций.
+     * Получить URL изображения промо-акции.
      */
-    public function registerMediaCollections(): void
+    public function getImageUrlAttribute(): string
     {
-        $this->addMediaCollection('promotion')
-            ->singleFile();
+        return $this->image_path ? asset('storage/' . $this->image_path) : asset('assets/images/default-promotion.png');
+    }
+
+    /**
+     * Получить URL баннера промо-акции.
+     */
+    public function getBannerUrlAttribute(): string
+    {
+        return $this->banner_image_path ? asset('storage/' . $this->banner_image_path) : asset('assets/images/default-banner.png');
     }
 
     /**

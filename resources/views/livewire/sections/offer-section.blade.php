@@ -8,7 +8,7 @@
     <div class="grid lg:grid-cols-2 mt-10 gap-5">
         @forelse($promotions as $promotion)
             <a href="{{ route('stock', ['id' => $promotion->id]) }}"
-                class="w-full h-[120px] lg:h-[200px] rounded-2xl transition duration-200 hover:shadow-2xl hover:scale-[1.01] overflow-hidden bg-no-repeat bg-cover px-7 lg:px-10 rounded-3xl flex flex-col justify-around bg-center"
+                class="w-full h-[140px] lg:h-[200px] transition duration-200 hover:shadow-2xl hover:scale-[1.01] overflow-hidden bg-no-repeat bg-cover px-7 lg:px-10 rounded-3xl flex flex-col justify-around bg-center"
                 style='background-image: url("{{ $promotion->image_url }}")' loading="lazy">
             </a>
         @empty

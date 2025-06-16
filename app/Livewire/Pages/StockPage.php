@@ -9,16 +9,24 @@ class StockPage extends Component
 {
     public $id;
 
+    public function mount($id = null)
+    {
+        $this->id = $id;
+    }
+
     public function render()
     {
-        $promotions = Promotion::query();
+        $promotion = null;
 
         if ($this->id) {
-            $promotions->where('id', $this->id);
+            $promotion = Promotion::with('products')
+                ->where('id', $this->id)
+                ->where('is_active', true)
+                ->first();
         }
 
         return view('livewire.pages.stock-page', [
-            'promotion' => $promotions->first(),
+            'promotion' => $promotion,
         ]);
     }
 }

@@ -1,17 +1,17 @@
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-10 items-center {{ $border ? 'border border-[#D5D5D5]' : '' }} p-3 lg:p-10 mt-10"
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-10 items-start md:items-center {{ $border ? 'border border-[#D5D5D5]' : '' }} p-3 sm:p-5 lg:p-10 mt-5 sm:mt-8 lg:mt-10"
     x-data="catalogProduct">
-    <a href="{{ route('catalog.single', ['id' => $product->id]) }}" class="flex justify-center">
-        <img :src="'/storage/' + attachment" alt="">
+    <a href="{{ route('catalog.single', ['id' => $product->id]) }}" class="flex justify-center order-1 md:order-none">
+        <img :src="'/storage/' + attachment" alt="{{ $product->name }}" class="w-full max-w-[200px] sm:max-w-[250px] md:max-w-none h-auto object-contain">
     </a>
 
-    <div class="lg:col-span-2">
+    <div class="md:col-span-1 lg:col-span-2 order-2 md:order-none">
 
-        <span class="font-bold text-[#C8B082] block text-xs lg:text-base">{{ $product->category }}</span>
+        <span class="font-bold text-[#C8B082] block text-xs sm:text-sm lg:text-base mb-1 sm:mb-2">{{ $product->category }}</span>
 
         <a href="{{ route('catalog.single', ['id' => $product->id]) }}"
-            class="block text-sm lg:text-2xl font-bold lg:mt-3">{{ $product->name }}</a>
+            class="block text-sm sm:text-lg md:text-xl lg:text-2xl font-bold mb-3 sm:mb-4 lg:mt-3 hover:text-[#C8B082] transition-colors">{{ $product->name }}</a>
         @if ($product->sizes)
-            <div class="flex items-center justify-start space-x-1 lg:space-x-3 mt-2 lg:mt-5">
+            <div class="flex items-center justify-start flex-wrap gap-1 sm:gap-2 lg:gap-3 mt-3 sm:mt-4 lg:mt-5">
                 @foreach ($product->sizes as $item)
 
 				@if($item['is_stock'])
@@ -37,7 +37,7 @@
                             )
                         "
 
-                        class="w-[35px] lg:w-[50px] h-[35px] lg:h-[50px] flex justify-center items-center rounded-full border border-[#E1C37A] text-[7px] lg:text-[12px] cursor-pointer"
+                        class="w-[32px] sm:w-[40px] lg:w-[50px] h-[32px] sm:h-[40px] lg:h-[50px] flex justify-center items-center rounded-full border border-[#E1C37A] text-[8px] sm:text-[10px] lg:text-[12px] cursor-pointer hover:bg-[#E1C37A] hover:text-white transition-colors"
                     >
                         <span class="font-bold w-full h-full flex justify-center items-center rounded-full"
                             :class="size == {{ $item['name'] }} ? 'bg-[#E1C37A] text-white' : ''">
@@ -51,22 +51,22 @@
         @endif
 
         <div
-            class="w-full lg:w-[200px] grid grid-cols-3 py-1 lg:py-2 border border-[#B9B9B9] rounded-[3px] mt-5 lg:mt-10">
-            <button type="button" class="text-[#C8B082] font-bold" @click="decrement()">-</button>
-            <span class="font-bold text-center text-xs lg:text-base leading-loose" x-text="qty + ' шт'"></span>
-            <button type="button" class="text-[#C8B082] font-bold" @click="increment()">+</button>
+            class="w-full sm:w-[150px] md:w-[180px] lg:w-[200px] grid grid-cols-3 py-1 sm:py-1.5 lg:py-2 border border-[#B9B9B9] rounded-[3px] mt-4 sm:mt-6 lg:mt-10">
+            <button type="button" class="text-[#C8B082] font-bold text-sm sm:text-base hover:bg-[#C8B082] hover:text-white transition-colors rounded-l-[3px]" @click="decrement()">-</button>
+            <span class="font-bold text-center text-xs sm:text-sm lg:text-base leading-loose bg-gray-50" x-text="qty + ' шт'"></span>
+            <button type="button" class="text-[#C8B082] font-bold text-sm sm:text-base hover:bg-[#C8B082] hover:text-white transition-colors rounded-r-[3px]" @click="increment()">+</button>
         </div>
 
-        <div class="flex flex-wrap lg:flex-nowrap items-center mt-5 lg:mt-10 lg:space-x-10 space-y-5 lg:space-y-0">
-            <div>
-                <p x-text="price + ' Тг'" class="text-sm lg:text-2xl font-bold text-left"
-                    :class="new_price ? '!text-[#C7A771] text-xs lg:!text-xl line-through' : ''"></p>
-                <p class="text-sm lg:text-2xl font-bold text-left" x-show='new_price' x-text="new_price + ' Тг'"></p>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between lg:justify-start mt-0 lg:mt-10 space-y-2 lg:space-y-4 sm:space-x-4 lg:space-x-10">
+            <div class="order-2 sm:order-1 mt-5 lg:mt-0">
+                <p x-text="price + ' Тг'" class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-left"
+                    :class="new_price ? '!text-[#C7A771] !text-xs sm:!text-sm md:!text-lg lg:!text-xl line-through' : ''"></p>
+                <p class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-left text-green-600" x-show='new_price' x-text="new_price + ' Тг'"></p>
             </div>
 
-            <div class="flex flex-wrap lg:flex-nowrap items-center lg:space-x-3 space-y-5 lg:space-y-0">
+            <div class="order-1 sm:order-2">
                 <button type="button" @click="addToCart()"
-                    class="border border-[#C8B082] transition duration-500 hover:bg-[#C8B082] hover:text-white py-1.5 lg:py-2.5 lg:w-[14rem] px-5 lg:px-0 rounded-[3px] text-black text-xs lg:text-[14px] font-bold text-center">В
+                    class="w-full sm:w-auto border border-[#C8B082] transition duration-500 hover:bg-[#C8B082] hover:text-white py-2 sm:py-2.5 lg:py-2.5 px-4 sm:px-6 lg:px-8 min-w-[120px] sm:min-w-[140px] lg:min-w-[14rem] rounded-[3px] text-black text-xs sm:text-sm lg:text-[14px] font-bold text-center">В
                     корзину</button>
             </div>
         </div>
