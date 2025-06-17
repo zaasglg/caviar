@@ -204,20 +204,7 @@ class PromotionResource extends Resource
                     ->since(),
             ])
             ->filters([
-                // Tables\Filters\TernaryFilter::make('is_active')
-                //     ->label('Статус акции')
-                //     ->placeholder('Все акции')
-                //     ->trueLabel('Только активные')
-                //     ->falseLabel('Только неактивные')
-                //     ->icon('heroicon-o-eye'),
-                // Tables\Filters\Filter::make('has_products')
-                //     ->label('С товарами')
-                //     ->query(fn (Builder $query): Builder => $query->has('products'))
-                //     ->icon('heroicon-o-cube'),
-                // Tables\Filters\Filter::make('no_description')
-                //     ->label('Без описания')
-                //     ->query(fn (Builder $query): Builder => $query->whereNull('description'))
-                //     ->icon('heroicon-o-document-text'),
+                
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()

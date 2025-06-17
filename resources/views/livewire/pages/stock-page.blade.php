@@ -33,9 +33,19 @@
             <div class="w-11/12 lg:w-9/12 mx-auto px-4 py-8 lg:py-12">
                 <h2 class="text-2xl md:text-3xl lg:text-[36px] font-bold mb-6 md:mb-8">Товары по акции:</h2>
                 @foreach($promotion->products as $product)
+                    @php
+                        $selectedSizes = $product->pivot->selected_sizes ?? [];
+                        // Декодируем JSON если это строка
+                        if (is_string($selectedSizes)) {
+                            $selectedSizes = json_decode($selectedSizes, true) ?? [];
+                        }
+                    @endphp
                     <div class="mb-6 last:mb-0">
                         <hr class="mb-6">
-                        <livewire:parts.product-catalog :product="$product" :border="false" />
+                        <livewire:parts.promotion-product-catalog 
+                            :product="$product" 
+                            :selectedSizes="$selectedSizes"
+                            :border="false" />
                     </div>
                 @endforeach
             </div>

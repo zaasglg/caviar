@@ -19,7 +19,9 @@ class StockPage extends Component
         $promotion = null;
 
         if ($this->id) {
-            $promotion = Promotion::with('products')
+            $promotion = Promotion::with(['products' => function ($query) {
+                $query->withPivot('selected_sizes');
+            }])
                 ->where('id', $this->id)
                 ->where('is_active', true)
                 ->first();

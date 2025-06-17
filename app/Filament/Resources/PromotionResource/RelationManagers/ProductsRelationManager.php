@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\Product;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\CheckboxList;
 
 class ProductsRelationManager extends RelationManager
 {
@@ -29,10 +30,44 @@ class ProductsRelationManager extends RelationManager
         return $form
             ->schema([
                 Select::make('product_id')
-                    ->label('Product')
+                    ->label('Товар')
                     ->options(Product::all()->pluck('name', 'id'))
                     ->required()
-                    ->searchable(),
+                    ->searchable()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        // Сбросить выбранные размеры при смене товара
+                        $set('selected_sizes', []);
+                    }),
+                CheckboxList::make('selected_sizes')
+                    ->label('Выберите граммовки')
+                    ->options(function (callable $get) {
+                        $productId = $get('product_id');
+                        if (!$productId) {
+                            return [];
+                        }
+                        
+                        $product = Product::find($productId);
+                        if (!$product || !$product->sizes) {
+                            return [];
+                        }
+                        
+                        $options = [];
+                        foreach ($product->sizes as $size) {
+                            if (isset($size['is_stock']) && $size['is_stock']) {
+                                $sizeKey = $size['name'];
+                                // Избегаем дублирования, используя размер как ключ
+                                if (!isset($options[$sizeKey])) {
+                                    $options[$sizeKey] = $size['name'] . ' г';
+                                }
+                            }
+                        }
+                        
+                        return $options;
+                    })
+                    ->required()
+                    ->helperText('Выберите конкретные граммовки этого товара для участия в акции')
+                    ->columns(2),
             ]);
     }
 
@@ -52,13 +87,28 @@ class ProductsRelationManager extends RelationManager
                     ->badge()
                     ->color('gray'),
                 Tables\Columns\TextColumn::make('sizes')
-                    ->label('Размеры')
-                    ->formatStateUsing(function ($state) {
-                        if (!$state) return 'Нет размеров';
-                        $sizes = collect($state)->pluck('name')->join(', ');
-                        return $sizes ?: 'Нет размеров';
+                    ->label('Выбранные граммовки')
+                    ->formatStateUsing(function ($record) {
+                        $selectedSizes = $record->pivot->selected_sizes ?? [];
+                        if (is_string($selectedSizes)) {
+                            $selectedSizes = json_decode($selectedSizes, true) ?? [];
+                        }
+                        
+                        if (empty($selectedSizes)) {
+                            return 'Все размеры';
+                        }
+                        
+                        // Удаляем дубликаты и сортируем
+                        $uniqueSizes = collect($selectedSizes)
+                            ->unique()
+                            ->sort(SORT_NUMERIC)
+                            ->map(fn($size) => $size . ' г');
+                        
+                        return $uniqueSizes->join(', ');
                     })
-                    ->limit(30),
+                    ->badge()
+                    ->color('primary')
+                    ->wrap(),
                 Tables\Columns\IconColumn::make('status')
                     ->label('Статус')
                     ->boolean()
@@ -85,12 +135,107 @@ class ProductsRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\AttachAction::make()
                     ->label('Добавить товар')
-                    ->modalHeading('Выберите товары для акции')
-                    ->preloadRecordSelect()
-                    ->recordSelectSearchColumns(['name', 'category'])
-                    ->multiple(),
+                    ->modalHeading('Добавить товар в акцию')
+                    ->form([
+                        Select::make('recordId')
+                            ->label('Товар')
+                            ->options(Product::where('status', true)->pluck('name', 'id'))
+                            ->required()
+                            ->searchable()
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                $set('selected_sizes', []);
+                            }),
+                        CheckboxList::make('selected_sizes')
+                            ->label('Выберите граммовки')
+                            ->options(function (callable $get) {
+                                $productId = $get('recordId');
+                                if (!$productId) {
+                                    return [];
+                                }
+                                
+                                $product = Product::find($productId);
+                                if (!$product || !$product->sizes) {
+                                    return [];
+                                }
+                                
+                                $options = [];
+                                foreach ($product->sizes as $size) {
+                                    if (isset($size['is_stock']) && $size['is_stock']) {
+                                        $sizeKey = $size['name'];
+                                        // Избегаем дублирования, используя размер как ключ
+                                        if (!isset($options[$sizeKey])) {
+                                            $options[$sizeKey] = $size['name'] . ' г - ' . 
+                                                number_format($size['old_price'], 0, ',', ' ') . ' тг';
+                                        }
+                                    }
+                                }
+                                
+                                return $options;
+                            })
+                            ->required()
+                            ->helperText('Выберите конкретные граммовки для участия в акции')
+                            ->columns(2),
+                    ])
+                    ->action(function (array $data, $livewire) {
+                        $promotion = $livewire->ownerRecord;
+                        
+                        // Убираем дубликаты из выбранных размеров
+                        $uniqueSizes = array_unique($data['selected_sizes'] ?? []);
+                        
+                        $promotion->products()->attach($data['recordId'], [
+                            'selected_sizes' => json_encode(array_values($uniqueSizes))
+                        ]);
+                    }),
             ])
             ->actions([
+                Tables\Actions\EditAction::make()
+                    ->label('Изменить граммовки')
+                    ->icon('heroicon-o-pencil-square')
+                    ->modalHeading('Изменить выбранные граммовки')
+                    ->form([
+                        CheckboxList::make('selected_sizes')
+                            ->label('Выберите граммовки')
+                            ->options(function ($record) {
+                                $product = $record;
+                                if (!$product || !$product->sizes) {
+                                    return [];
+                                }
+                                
+                                $options = [];
+                                foreach ($product->sizes as $size) {
+                                    if (isset($size['is_stock']) && $size['is_stock']) {
+                                        $sizeKey = $size['name'];
+                                        // Избегаем дублирования, используя размер как ключ
+                                        if (!isset($options[$sizeKey])) {
+                                            $options[$sizeKey] = $size['name'] . ' г - ' . 
+                                                number_format($size['old_price'], 0, ',', ' ') . ' тг';
+                                        }
+                                    }
+                                }
+                                
+                                return $options;
+                            })
+                            ->default(function ($record) {
+                                $selectedSizes = $record->pivot->selected_sizes ?? '[]';
+                                if (is_string($selectedSizes)) {
+                                    return json_decode($selectedSizes, true) ?? [];
+                                }
+                                return $selectedSizes;
+                            })
+                            ->required()
+                            ->columns(2),
+                    ])
+                    ->action(function (array $data, $record, $livewire) {
+                        $promotion = $livewire->ownerRecord;
+                        
+                        // Убираем дубликаты из выбранных размеров
+                        $uniqueSizes = array_unique($data['selected_sizes'] ?? []);
+                        
+                        $promotion->products()->updateExistingPivot($record->id, [
+                            'selected_sizes' => json_encode(array_values($uniqueSizes))
+                        ]);
+                    }),
                 Tables\Actions\DetachAction::make()
                     ->label('Удалить')
                     ->icon('heroicon-o-trash'),

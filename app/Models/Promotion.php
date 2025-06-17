@@ -63,6 +63,8 @@ class Promotion extends Model
      */
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'promotion_product');
+        return $this->belongsToMany(Product::class, 'promotion_product')
+            ->withPivot('selected_sizes')
+            ->withTimestamps();
     }
 }
