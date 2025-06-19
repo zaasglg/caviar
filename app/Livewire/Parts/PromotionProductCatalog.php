@@ -4,6 +4,7 @@ namespace App\Livewire\Parts;
 
 use Livewire\Component;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use Masmerise\Toaster\Toaster;
 
 class PromotionProductCatalog extends Component
 {
@@ -26,22 +27,25 @@ class PromotionProductCatalog extends Component
             return;
         }
 
-        $cartItem = [
+        Cart::add([
             'id' => $id . '_' . $size,
             'name' => $name . ' (' . $size . ' г)',
             'qty' => $qty,
             'price' => str_replace(' ', '', $new_price ?: $price),
+            'weight' => $size, // Добавляем поле weight для совместимости с другими частями системы
             'options' => [
                 'size' => $size,
-                'image' => $attachment,
-                'old_price' => str_replace(' ', '', $price),
+                'hero' => $attachment, // Используем 'hero' вместо 'image' для единообразия
+                'price' => str_replace(' ', '', $price),
                 'new_price' => $new_price ? str_replace(' ', '', $new_price) : null,
+                'old_price' => str_replace(' ', '', $price), // Оставляем old_price для обратной совместимости
+                'type' => 'product' // Добавляем тип продукта для единообразия
             ]
-        ];
+        ]);
 
-        Cart::add($cartItem);
         $this->dispatch('cartAdded');
         $this->dispatch('success', 'Товар добавлен в корзину');
+        Toaster::success('Вы успешно добавили товар в корзину!');
     }
 
     public function render()

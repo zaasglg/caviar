@@ -32,8 +32,10 @@
                                 // Автоматически выбираем первый доступный размер, если еще не выбран
                                 if (!size) {
                                     size = '{{ $item['name'] }}';
-                                    price = '{{ number_format($item['old_price'], 0, ',', ' ') }}';
-                                    new_price = '{{ $item['new_price'] ? number_format($item['new_price'], 0, ',', ' ') : '' }}';
+                                    basePrice = '{{ number_format($item['old_price'], 0, ',', ' ') }}';
+                                    baseNewPrice = '{{ $item['new_price'] ? number_format($item['new_price'], 0, ',', ' ') : '' }}';
+                                    price = basePrice;
+                                    new_price = baseNewPrice;
                                     attachment = '{{ $item['attachments'][0] ?? $product->image }}';
                                 }
                             "
@@ -69,9 +71,9 @@
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between lg:justify-start mt-0 lg:mt-10 space-y-2 lg:space-y-4 sm:space-x-4 lg:space-x-10">
             <div class="order-2 sm:order-1 mt-5 lg:mt-0">
-                <p x-text="price + ' Тг'" class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-left"
+                <p x-text="getTotalPrice() + ' Тг'" class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-left"
                     :class="new_price ? '!text-[#C7A771] !text-xs sm:!text-sm md:!text-lg lg:!text-xl line-through' : ''"></p>
-                <p class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-left text-green-600" x-show='new_price' x-text="new_price + ' Тг'"></p>
+                <p class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-left text-green-600" x-show='new_price' x-text="getTotalNewPrice() + ' Тг'"></p>
             </div>
 
             <div class="order-1 sm:order-2">
@@ -94,11 +96,15 @@
                 size: '',
                 price: '',
                 new_price: '',
+                basePrice: '', // Базовая цена за единицу
+                baseNewPrice: '', // Базовая новая цена за единицу
                 qty: 1,
                 attachment: '',
                 selectedSizes: @js($selectedSizes),
                 update(size, price, attachment, new_price) {
                     this.size = size;
+                    this.basePrice = price;
+                    this.baseNewPrice = new_price;
                     this.price = price;
                     this.new_price = new_price;
                     this.attachment = attachment;
@@ -107,9 +113,21 @@
                     this.qty++;
                 },
                 decrement() {
-                    if (this.qty > 0) {
+                    if (this.qty > 1) {
                         this.qty--;
                     }
+                },
+                getTotalPrice() {
+                    if (!this.basePrice || this.basePrice === '') return '0';
+                    const basePriceNum = parseFloat(this.basePrice.replace(/\s/g, ''));
+                    if (isNaN(basePriceNum)) return '0';
+                    return (basePriceNum * this.qty).toLocaleString('ru-RU');
+                },
+                getTotalNewPrice() {
+                    if (!this.baseNewPrice || this.baseNewPrice === '') return '';
+                    const baseNewPriceNum = parseFloat(this.baseNewPrice.replace(/\s/g, ''));
+                    if (isNaN(baseNewPriceNum)) return '';
+                    return (baseNewPriceNum * this.qty).toLocaleString('ru-RU');
                 },
                 addToCart() {
                     if (!this.size) {
@@ -117,7 +135,8 @@
                         return;
                     }
 
-                    $wire.addToCart(this.id, this.name, this.qty, this.size, this.price, this.attachment, this.new_price)
+                    // Отправляем базовые цены, а не пересчитанные
+                    $wire.addToCart(this.id, this.name, this.qty, this.size, this.basePrice, this.attachment, this.baseNewPrice)
                 }
             }
         })
