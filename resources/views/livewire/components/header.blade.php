@@ -1,4 +1,4 @@
-<nav x-data="{ menuOpen: false, catalogOpen: false }" class="fixed lg:relative w-full bg-[#082140] py-2" style="z-index: 999">
+<nav x-data="{ menuOpen: false, catalogOpen: false }" class="sticky lg:relative top-0 w-full bg-[#082140] py-2" style="z-index: 999">
     <div class="w-11/12 lg:w-9/12 mx-auto flex justify-between items-center">
         {{-- Logo and Brand Name --}}
         <div class="flex space-x-3 lg:space-x-5 items-center relative">

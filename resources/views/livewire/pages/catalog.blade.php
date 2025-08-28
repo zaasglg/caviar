@@ -20,20 +20,44 @@
         </div>
 
         <div x-show="active == 1" class="grid grid-cols-2 lg:grid-cols-1 gap-2">
-            @foreach ($products_black as $product)
-                <livewire:parts.product-catalog :product="$product">
-            @endforeach
+            @if(count($products_black) > 0)
+                @foreach ($products_black as $product)
+                    <livewire:parts.product-catalog :product="$product">
+                @endforeach
+            @else
+                <div class="col-span-2 lg:col-span-1 flex justify-center items-center py-32 lg:py-40">
+                    <div class="text-center">
+                        <p class="text-lg lg:text-xl text-gray-600 font-medium">В данный момент данная продукция отсутствует</p>
+                    </div>
+                </div>
+            @endif
         </div>
         <div x-show="active == 2" class="grid grid-cols-2 lg:grid-cols-1 gap-2">
-            @foreach ($products_red as $product)
-                <livewire:parts.product-catalog :product="$product">
-            @endforeach
+            @if(count($products_red) > 0)
+                @foreach ($products_red as $product)
+                    <livewire:parts.product-catalog :product="$product">
+                @endforeach
+            @else
+                <div class="col-span-2 lg:col-span-1 flex justify-center items-center h-96 py-32 lg:py-40">
+                    <div class="text-center">
+                        <p class="text-lg lg:text-xl text-gray-600 font-regular">В данный момент данная продукция отсутствует</p>
+                    </div>
+                </div>
+            @endif
         </div>
         <div x-show="active == 3" class="grid grid-cols-2 lg:grid-cols-1 gap-2">
-            @foreach ($gifts as $gift)
-                {{-- @livewire('catalog-product', ['product' => $gift]) --}}
-                <livewire:parts.gift-catalog :gift="$gift">
-            @endforeach
+            @if(count($gifts) > 0)
+                @foreach ($gifts as $gift)
+                    {{-- @livewire('catalog-product', ['product' => $gift]) --}}
+                    <livewire:parts.gift-catalog :gift="$gift">
+                @endforeach
+            @else
+                <div class="col-span-2 lg:col-span-1 flex justify-center items-center h-96 py-32 lg:py-40">
+                    <div class="text-center">
+                        <p class="text-base lg:text-xl text-gray-800 font-regular">В данный момент данная продукция отсутствует</p>
+                    </div>
+                </div>
+            @endif
         </div>
     </section>
 

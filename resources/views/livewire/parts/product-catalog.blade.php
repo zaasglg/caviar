@@ -61,7 +61,7 @@
             <div class="order-2 sm:order-1 mt-5 lg:mt-0">
                 <p x-text="price + ' Тг'" class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-left"
                     :class="new_price ? '!text-[#C7A771] !text-xs sm:!text-sm md:!text-lg lg:!text-xl line-through' : ''"></p>
-                <p class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-left text-green-600" x-show='new_price' x-text="new_price + ' Тг'"></p>
+                <p class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-left text-gray-900" x-show='new_price' x-text="new_price + ' Тг'"></p>
             </div>
 
             <div class="order-1 sm:order-2">

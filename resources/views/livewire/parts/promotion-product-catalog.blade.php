@@ -73,7 +73,7 @@
             <div class="order-2 sm:order-1 mt-5 lg:mt-0">
                 <p x-text="getTotalPrice() + ' Тг'" class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-left"
                     :class="new_price ? '!text-[#C7A771] !text-xs sm:!text-sm md:!text-lg lg:!text-xl line-through' : ''"></p>
-                <p class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-left text-green-600" x-show='new_price' x-text="getTotalNewPrice() + ' Тг'"></p>
+                <p class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-left text-gray-900" x-show='new_price' x-text="getTotalNewPrice() + ' Тг'"></p>
             </div>
 
             <div class="order-1 sm:order-2">
@@ -121,12 +121,21 @@
                     if (!this.basePrice || this.basePrice === '') return '0';
                     const basePriceNum = parseFloat(this.basePrice.replace(/\s/g, ''));
                     if (isNaN(basePriceNum)) return '0';
+                    
+                    // Если есть скидочная цена, показываем старую цену без умножения на количество
+                    if (this.baseNewPrice && this.baseNewPrice !== '') {
+                        return basePriceNum.toLocaleString('ru-RU');
+                    }
+                    
+                    // Если нет скидочной цены, умножаем на количество
                     return (basePriceNum * this.qty).toLocaleString('ru-RU');
                 },
                 getTotalNewPrice() {
                     if (!this.baseNewPrice || this.baseNewPrice === '') return '';
                     const baseNewPriceNum = parseFloat(this.baseNewPrice.replace(/\s/g, ''));
                     if (isNaN(baseNewPriceNum)) return '';
+                    
+                    // Скидочная цена всегда умножается на количество
                     return (baseNewPriceNum * this.qty).toLocaleString('ru-RU');
                 },
                 addToCart() {

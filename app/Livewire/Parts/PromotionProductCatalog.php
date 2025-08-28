@@ -31,15 +31,13 @@ class PromotionProductCatalog extends Component
             'id' => $id . '_' . $size,
             'name' => $name . ' (' . $size . ' г)',
             'qty' => $qty,
-            'price' => str_replace(' ', '', $new_price ?: $price),
-            'weight' => $size, // Добавляем поле weight для совместимости с другими частями системы
+            'price' => (int) str_replace(' ', '', $new_price ?: $price),
+            'weight' => $size,
             'options' => [
-                'size' => $size,
-                'hero' => $attachment, // Используем 'hero' вместо 'image' для единообразия
-                'price' => str_replace(' ', '', $price),
-                'new_price' => $new_price ? str_replace(' ', '', $new_price) : null,
-                'old_price' => str_replace(' ', '', $price), // Оставляем old_price для обратной совместимости
-                'type' => 'product' // Добавляем тип продукта для единообразия
+                'hero' => $attachment,
+                'price' => $price,
+                'new_price' => $new_price ?? '',
+                'type' => 'product'
             ]
         ]);
 

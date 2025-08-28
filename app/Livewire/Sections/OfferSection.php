@@ -17,9 +17,7 @@ class OfferSection extends Component
         $this->color = $color;
         $this->single = $single;
         
-        $this->promotions = Cache::remember('active_promotions', 3600, function () {
-            return Promotion::where('is_active', true)->get();
-        });
+        $this->promotions = Promotion::where('is_active', true)->get();
     }
 
     public function render()
